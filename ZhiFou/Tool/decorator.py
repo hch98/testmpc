@@ -4,7 +4,7 @@ from math import ceil
 from django.db import connection
 from django.http import HttpResponse
 
-
+zeng'j增加证据吱吱吱吱吱吱吱吱吱吱吱吱在
 # 装饰器，检查request参数是否齐全
 def check_request(*params):
     def __check_request(func):
