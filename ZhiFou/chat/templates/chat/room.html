@@ -1,0 +1,83 @@
+<!-- chat/templates/chat/room.html -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Chat Room</title>
+</head>
+
+<body>
+    <textarea id="chat-log" cols="100" rows="20"></textarea><br />
+    <input id="chat-message-input" type="text" size="100" /><br />
+    <input id="chat-message-submit" type="button" value="Send" />
+</body>
+<script>
+    // var roomName = {{ room_name_json }};
+    var from_id = {{ from_id }};
+    var to_id = {{ to_id }};
+    var time = new Date();
+
+    // WebSocket路径为ws://'ws://' + window.location.host +'/ws/chat/' + from_id + '-' + to_id + '/'
+    // from_id是本人
+    // to_id是私信的好友
+    var chatSocket = new WebSocket(
+        'ws://' + window.location.host +
+        '/ws/chat/' + from_id + '-' + to_id + '/');
+    //  console.log(chatSocket);  用来查看websocket路径
+
+
+    // websocket客户端接收数据时
+    //注意判断返回来的json数据数量，数量大于1说明是历史记录，等于1为一条私信内容
+    chatSocket.onmessage = function (e) {
+        var data = JSON.parse(e.data);
+        // console.log(data);
+        if(data.length>1){
+            // console.log(data);
+            // console.log(data.length);
+
+            for (let i = data.length-1; i >= 0; i--) {
+                let message = data[i]['content'];
+                document.querySelector('#chat-log').value += (message + '\n');
+            }
+        }
+        else{
+            let message = data['content'];
+            document.querySelector('#chat-log').value += (message + '\n');
+        }
+    };
+
+    // 断开连接处理函数,不知道是否需要处理
+    chatSocket.onclose = function (e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    document.querySelector('#chat-message-input').focus();
+    document.querySelector('#chat-message-input').onkeyup = function (e) {
+        if (e.keyCode === 13) {  // enter, return
+            document.querySelector('#chat-message-submit').click();
+        }
+    };
+
+    // websocket客户端发送数据,json格式如下
+    // {
+    //     'content': message,      //私信内容
+    //     'from_id': from_id,      //发出者
+        // 'to_id': to_id,          //发送者
+    //     'create_time': time.getDate()        //发送时间
+    // }
+    document.querySelector('#chat-message-submit').onclick = function (e) {
+        var messageInputDom = document.querySelector('#chat-message-input');
+        var message = messageInputDom.value;
+        chatSocket.send(JSON.stringify({
+            'content': message,
+            'from_id': from_id,
+            'to_id': to_id,
+            'create_time': time.getDate()
+        }));
+
+        messageInputDom.value = '';
+    };
+</script>
+
+</html>
