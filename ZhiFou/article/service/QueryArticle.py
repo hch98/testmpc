@@ -14,42 +14,8 @@ from article.models import Article, Collection, Comment
 
 from comment.dao.CommentDao import queryComentCount
 
-# 首页查询
-@csrf_exempt
-@check_request('page', 'order_type','user_id')
-#@checkToken ("")
 def queryArticle(request):
     json_req = json.loads(request.body)
-
-    order = check_order(json_req['order_type'])  # 排序类型默认按时间，0 按时间，1 按阅读数，2 按点赞数
-    try:
-        article_count = Article.objects.filter(flag=1).count()
-    except:
-        return HttpResponse(json.dumps({'code': 405, 'information': 'sql执行异常！'}), content_type="application/json")
-        page = check_page(json_req['page'], article_count)
-        sql = ArticleDao.queryArticle(order)
-        articles = execute_sql(sql, 1001, page)
-        json_list = []
-        for article in articles:
-            json_dict = {"article_id": article[0],
-                         "title": article[1],
-                         "simple_content": article[2],
-                         "page_view": queryPageView(article[0]),
-                         "create_time": article[4].strftime('%Y{y}%m{m}%d{d}%H:%M:%S').format(y='年', m='月', d='日'),
-                         "user_url": article[5],
-                         "user_name": article[6],
-                         "user_account": article[7],
-                         "type_name": article[8],
-                         "type_id": article[9],
-                         "point_flag": article[10],
-                         "point_count": article[11],
-                         "photo_url": article[12],
-                         "photo_flag": article[13],
-                         "comment_count": article[14],
-                         }
-            json_list.append(json_dict)
-        result = {'code': 200, 'article_count': article_count, 'data': json_list}
-        return HttpResponse(json.dumps(result, ensure_ascii=False), content_type="application/json")
     result = {'code': 401}
     return HttpResponse(json.dumps(result, ensure_ascii=False), content_type="application/json")
 
