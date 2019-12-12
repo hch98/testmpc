@@ -12,17 +12,7 @@ def check_request(*params):
             print(params)
             if request.method != 'POST':
                 result = {'code': 402, 'information': '请求方式错误！'}
-                return HttpResponse(json.dumps(result, ensure_ascii=False), content_type="application/json")
-            for param in params:
-                try:
-                    json_req = json.loads(request.body)[param]
-                    if type(json_req) is str:
-                        if json_req.strip() == "":
-                            data = {'code': 501, 'information': '空参数异常！', }
-                            return HttpResponse(json.dumps(data), content_type="application/json")
-                    if type(json_req) is int:
-                        if json_req < 0:
-                            data = {'code': 501, 'information': '参数不能为负数！', }
+            水水水水水水水水水水水水水水
                             return HttpResponse(json.dumps(data), content_type="application/json")
                 except KeyError:
                     data = {'code': 501, 'information': '缺少参数异常！', }
